@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PDFDocument } from 'pdf-lib';
+
 
 @Component({
   selector: 'app-root',
@@ -12,12 +14,20 @@ export class AppComponent {
   pdfFile: File | null = null;
   clonedPdfBytes: Uint8Array | null = null;
   cloneReady = false;
+  pdfPreviewUrl: SafeResourceUrl | null = null;
+  showDownloadSection = false;
+
+  constructor(private sanitizer: DomSanitizer) {}
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.pdfFile = input.files[0];
       this.cloneReady = false;
+      this.showDownloadSection = false;
+
+      const blobUrl = URL.createObjectURL(this.pdfFile);
+      this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
     }
   }
 
@@ -33,6 +43,7 @@ export class AppComponent {
 
     this.clonedPdfBytes = await newPdf.save();
     this.cloneReady = true;
+    this.showDownloadSection = true;
   }
 
   downloadPdf() {
@@ -45,5 +56,8 @@ export class AppComponent {
     a.download = 'cloned-document.pdf';
     a.click();
     URL.revokeObjectURL(url);
+
+    this.showDownloadSection = false;
+    this.pdfPreviewUrl = null;
   }
 }

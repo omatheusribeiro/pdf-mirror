@@ -11,8 +11,13 @@
     <button class="btn btn-primary w-100" [disabled]="!pdfFile" (click)="clonePdf()">Clone PDF</button>
   </div>
 
-  <div *ngIf="cloneReady" class="text-center mt-4">
+  <div *ngIf="cloneReady && showDownloadSection" class="text-center mt-4">
     <p class="text-success">Your cloned PDF is ready!</p>
+
+    <div class="mb-3">
+      <iframe *ngIf="pdfPreviewUrl" [src]="pdfPreviewUrl" width="100%" height="500px" class="border rounded shadow-sm"></iframe>
+    </div>
+
     <button class="btn btn-success" (click)="downloadPdf()">Download Cloned PDF</button>
   </div>
 </div>
