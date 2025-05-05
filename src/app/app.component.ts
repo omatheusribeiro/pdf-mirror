@@ -1,14 +1,18 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Component } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PDFDocument } from 'pdf-lib';
 
 
+
+declare const bootstrap: any; 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   pdfFile: File | null = null;
@@ -16,6 +20,7 @@ export class AppComponent {
   cloneReady = false;
   pdfPreviewUrl: SafeResourceUrl | null = null;
   showDownloadSection = false;
+  fileName: string = 'cloned-document'; // valor inicial
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -46,18 +51,28 @@ export class AppComponent {
     this.showDownloadSection = true;
   }
 
-  downloadPdf() {
+  openRenameModal() {
+    const modalElement = document.getElementById('renameModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
+  }
+
+  confirmDownload() {
     if (!this.clonedPdfBytes) return;
 
+    const safeFileName = this.fileName.trim() || 'document';
     const blob = new Blob([this.clonedPdfBytes], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'cloned-document.pdf';
+    a.download = `${safeFileName}.pdf`;
     a.click();
     URL.revokeObjectURL(url);
 
     this.showDownloadSection = false;
     this.pdfPreviewUrl = null;
+    this.fileName = 'cloned-document';
   }
 }
