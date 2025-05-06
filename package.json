@@ -24,7 +24,6 @@
     "bootstrap": "^5.3.5",
     "express": "^4.18.2",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^5.2.133",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
