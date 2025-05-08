@@ -8,6 +8,9 @@
     <label for="pdfFile" class="form-label">Choose a PDF file to clone:</label>
     <input type="file" class="form-control mb-3" id="pdfFile" accept="application/pdf" (change)="onFileSelected($event)">
 
+    <label for="codeInput" class="form-label">Insert Code (optional):</label>
+    <textarea class="form-control mb-3" id="codeInput" rows="5" [(ngModel)]="codeText" placeholder="Write your code here..."></textarea>
+
     <button class="btn btn-primary w-100" [disabled]="!pdfFile" (click)="clonePdf()">Clone PDF</button>
   </div>
 
@@ -19,9 +22,9 @@
     </div>
 
     <button class="btn btn-success" (click)="openRenameModal()">Download Cloned PDF</button>
-
   </div>
 </div>
+
 <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -45,4 +48,3 @@
     </div>
   </div>
 </div>
-

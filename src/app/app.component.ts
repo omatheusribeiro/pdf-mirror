@@ -2,9 +2,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 declare const bootstrap: any; 
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -18,7 +19,8 @@ export class AppComponent {
   cloneReady = false;
   pdfPreviewUrl: SafeResourceUrl | null = null;
   showDownloadSection = false;
-  fileName: string = 'cloned-document'; // valor inicial
+  fileName: string = 'cloned-document';
+  codeText: string = '';
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -43,6 +45,24 @@ export class AppComponent {
 
     const pages = await newPdf.copyPages(originalPdf, originalPdf.getPageIndices());
     pages.forEach((page) => newPdf.addPage(page));
+
+    if (this.codeText.trim()) {
+      const page = newPdf.addPage([600, 800]);
+      const font = await newPdf.embedFont(StandardFonts.Courier);
+      const fontSize = 12;
+      const margin = 20;
+
+      const lines = this.codeText.split('\n');
+      lines.forEach((line, index) => {
+        page.drawText(line, {
+          x: margin,
+          y: page.getHeight() - margin - fontSize * (index + 1),
+          size: fontSize,
+          font,
+          color: rgb(0, 0, 0),
+        });
+      });
+    }
 
     this.clonedPdfBytes = await newPdf.save();
     this.cloneReady = true;

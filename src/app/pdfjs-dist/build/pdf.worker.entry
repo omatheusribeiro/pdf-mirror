@@ -1,1 +1,0 @@
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfjsWorker;
