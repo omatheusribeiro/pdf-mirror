@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
 
-declare const bootstrap: any; 
+declare const bootstrap: any;
 
 @Component({
   selector: 'app-root',
@@ -21,6 +21,7 @@ export class AppComponent {
   showDownloadSection = false;
   fileName: string = 'cloned-document';
   codeText: string = '';
+  isMalicious: boolean = false;
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -33,11 +34,23 @@ export class AppComponent {
 
       const blobUrl = URL.createObjectURL(this.pdfFile);
       this.pdfPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+
+      // Verificar conteúdo malicioso
+      this.checkForMaliciousCode(this.pdfFile);
     }
   }
 
+  async checkForMaliciousCode(file: File) {
+    const arrayBuffer = await file.arrayBuffer();
+    const text = new TextDecoder().decode(arrayBuffer);
+
+    const maliciousPatterns = /\/JavaScript|\/JS|eval|app\.alert|Launch|Action/i;
+
+    this.isMalicious = maliciousPatterns.test(text);
+  }
+
   async clonePdf() {
-    if (!this.pdfFile) return;
+    if (!this.pdfFile || this.isMalicious) return;
 
     const arrayBuffer = await this.pdfFile.arrayBuffer();
     const originalPdf = await PDFDocument.load(arrayBuffer);
@@ -59,7 +72,6 @@ export class AppComponent {
           y: page.getHeight() - margin - fontSize * (index + 1),
           size: fontSize,
           font,
-          color: rgb(0, 0, 0),
         });
       });
     }
@@ -88,9 +100,5 @@ export class AppComponent {
     a.download = `${safeFileName}.pdf`;
     a.click();
     URL.revokeObjectURL(url);
-
-    this.showDownloadSection = false;
-    this.pdfPreviewUrl = null;
-    this.fileName = 'cloned-document';
   }
 }

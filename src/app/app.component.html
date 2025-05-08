@@ -8,10 +8,14 @@
     <label for="pdfFile" class="form-label">Choose a PDF file to clone:</label>
     <input type="file" class="form-control mb-3" id="pdfFile" accept="application/pdf" (change)="onFileSelected($event)">
 
+    <div *ngIf="isMalicious" class="alert alert-danger">
+      Warning: The uploaded PDF contains suspicious or potentially malicious code!
+    </div>
+
     <label for="codeInput" class="form-label">Insert Code (optional):</label>
     <textarea class="form-control mb-3" id="codeInput" rows="5" [(ngModel)]="codeText" placeholder="Write your code here..."></textarea>
 
-    <button class="btn btn-primary w-100" [disabled]="!pdfFile" (click)="clonePdf()">Clone PDF</button>
+    <button class="btn btn-primary w-100" [disabled]="!pdfFile || isMalicious" (click)="clonePdf()">Clone PDF</button>
   </div>
 
   <div *ngIf="cloneReady && showDownloadSection" class="text-center mt-4">
